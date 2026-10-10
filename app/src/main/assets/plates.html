@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Выбивалка автономеров</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eceef3;--card:#fff;--tx:#12131a;--mut:#6a6e7e;--bd:#d9dce6;--ac:#12131a;--on:#fff;--sim:#f4f5f9;
+--c0:#7d8394;--c1:#1f9d55;--c2:#2678e8;--c3:#9b3fe0;--c4:#e8890c;--c5:#e8265f;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d0e14;--card:#171923;--tx:#eef0f7;--mut:#8f94a8;--bd:#262a38;--ac:#eef0f7;--on:#0d0e14;--sim:#1d2030;--c0:#98a0b5;--c1:#3ccf7a;--c2:#4f9bff;--c3:#bb6bff;--c4:#ffab2e;--c5:#ff4f84}}
+:root[data-theme="dark"]{--bg:#0d0e14;--card:#171923;--tx:#eef0f7;--mut:#8f94a8;--bd:#262a38;--ac:#eef0f7;--on:#0d0e14;--sim:#1d2030;--c0:#98a0b5;--c1:#3ccf7a;--c2:#4f9bff;--c3:#bb6bff;--c4:#ffab2e;--c5:#ff4f84}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:Rubik,system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+.w{max-width:480px;margin:0 auto;padding:14px 14px 40px}
+header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+h1{font-size:19px;margin:0;font-weight:700}
+.bal{font-family:Oswald,sans-serif;font-weight:700;font-size:20px;background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:4px 14px}
+button{font:inherit;color:inherit;cursor:pointer;border:0}
+button:focus-visible{outline:3px solid var(--c2);outline-offset:2px}
+.tabs,.seg,.chips,.acts{display:flex;gap:6px}
+.tabs{margin-bottom:14px}.seg{margin-bottom:14px}
+.tabs button,.seg button,.chips button{flex:1;padding:10px 6px;border-radius:10px;background:var(--card);border:1px solid var(--bd);font-weight:500}
+.tabs .on,.seg .on,.chips .on{background:var(--ac);color:var(--on);border-color:var(--ac)}
+.seg button{padding:10px 4px;line-height:1.25}.seg small{display:block;opacity:.7;font-size:11px}
+.stage{background:var(--sim);border-top:6px solid var(--rc,var(--bd));border-radius:14px;padding:20px 12px 16px;text-align:center;min-height:196px;margin-bottom:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.pw{filter:drop-shadow(0 0 0 transparent);transition:filter .3s;max-width:100%}
+.pw.g{filter:drop-shadow(0 0 12px var(--rc))}
+.pw.m{animation:pl 1.4s ease-in-out infinite}
+@keyframes pl{50%{filter:drop-shadow(0 0 26px var(--rc))}}
+.pw.pop{animation:pp .35s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pp{from{transform:scale(.88);opacity:.4}}
+.pl{display:inline-flex;align-items:stretch;background:#fff;color:#111;border:.07em solid #111;border-radius:.2em;font-family:Oswald,sans-serif;font-weight:700;font-size:var(--fs,34px);line-height:1;overflow:hidden;box-shadow:0 .05em 0 #0003;vertical-align:middle}
+.pm{padding:.16em .3em;letter-spacing:.04em;white-space:nowrap;display:flex;align-items:center}
+.rg{display:flex;flex-direction:column;align-items:center;justify-content:center;border-left:.06em solid #111;padding:0 .22em;min-width:1.5em}
+.rg b{font-size:.8em;line-height:1}
+.rg span{font-size:.26em;display:flex;align-items:center;gap:.3em;font-weight:500;margin-top:.15em}
+.rg u{display:inline-block;width:.9em;height:.6em;background:linear-gradient(#fff 33%,#1d4fd8 33% 66%,#d52b1e 66%);border:1px solid #0005}
+.st{color:#fff;font-size:.36em;display:flex;align-items:flex-end;justify-content:center;padding:0 .5em .55em;min-width:1.5em;font-weight:700}
+.st.ua{background:linear-gradient(#0b4fb3 60%,#f4c20d 60%)}
+.st.kz{background:#00a3c4}
+.rl{font-weight:700;color:var(--rc,var(--mut));min-height:22px}
+.pr{color:var(--mut);min-height:22px}
+.go{width:100%;padding:16px;border-radius:14px;background:var(--ac);color:var(--on);font-weight:700;font-size:17px}
+.go:disabled{opacity:.4;cursor:not-allowed}
+.sec{padding:9px 14px;border-radius:10px;background:var(--card);border:1px solid var(--bd);font-weight:500}
+.odds{margin-top:18px;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:6px 14px}
+.od{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd);font-size:14px}
+.od:last-child{border:0}.od i{width:10px;height:10px;border-radius:50%;background:var(--rc)}
+.od b{flex:1;font-weight:500}.od span{color:var(--mut);font-size:13px}
+.hint{color:var(--mut);font-size:12.5px;margin:10px 2px 0;line-height:1.45}
+.sum{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.sum b{font-family:Oswald,sans-serif;font-size:24px}
+.chips{margin-bottom:10px}.chips button{padding:7px 4px;font-size:14px}
+.acts{margin-bottom:12px}.acts .sec{flex:1;font-size:14px}
+.it{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--bd);border-left:5px solid var(--rc);border-radius:12px;padding:10px 10px 10px 12px;margin-bottom:8px}
+.it .im{flex:1;min-width:0;overflow:hidden}.it small{display:block;margin-top:5px;color:var(--rc);font-weight:500}
+.ip{text-align:right;font-family:Oswald,sans-serif;font-weight:700;font-size:15px}
+.ip button{display:block;margin:4px 0 0 auto;font-family:Rubik,sans-serif;font-weight:500;font-size:13px;padding:5px 10px;border-radius:8px;background:var(--ac);color:var(--on)}
+.empty{text-align:center;color:var(--mut);padding:36px 10px;line-height:1.5}
+.foot{margin-top:22px;text-align:center}.foot button{background:none;color:var(--mut);text-decoration:underline;font-size:13px}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="w">
+<header><h1>Выбивалка автономеров</h1><div class="bal" id="bal"></div></header>
+<nav class="tabs"><button class="on" data-t="roll">Выбивать</button><button data-t="store">Гараж <span id="cnt"></span></button></nav>
+
+<section id="roll">
+ <div class="seg" id="cs"></div>
+ <div class="stage" id="stg"><div class="pw" id="pw"></div><div class="rl" id="rl">Выбери страну и жми кнопку</div><div class="pr" id="pr"></div><button class="sec" id="sell" hidden></button></div>
+ <button class="go" id="go"></button>
+ <div id="bonus" hidden><button class="sec" id="bb" style="width:100%;margin-top:8px">Монеты кончились — получить 300 🪙</button></div>
+ <div class="odds" id="odds"></div>
+ <p class="hint">Все номера вымышленные, монеты игровые. Цену поднимают ровные цифры (777, 123, 001), красивые буквы (ААА, AA…AA) и престижный регион: 77 и 777 в России, Киев в Украине, 01 и 02 в Казахстане. Чем больше совпадений, тем дороже.</p>
+</section>
+
+<section id="store" hidden>
+ <div class="sum"><span>Стоимость гаража</span><b id="tot"></b></div>
+ <div class="chips" id="fl"></div>
+ <div class="acts"><button class="sec" id="s0">Продать обычные</button><button class="sec" id="sa">Продать всё</button></div>
+ <div id="list"></div>
+ <div class="foot"><button id="rs">Начать заново</button></div>
+</section>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const d=()=>Math.random()*10|0, rnd=(a,b)=>a+(Math.random()*(b-a)|0), pick=a=>a[rnd(0,a.length)];
+const rds=n=>Array.from({length:n},d).join('');
+const R=[
+ {k:'Обычный',w:700,lo:8,hi:40},{k:'Необычный',w:200,lo:80,hi:220},{k:'Редкий',w:70,lo:400,hi:1100},
+ {k:'Эпический',w:22,lo:2000,hi:5500},{k:'Легендарный',w:7,lo:7000,hi:16000},{k:'Мифический',w:1,lo:40000,hi:110000}];
+const C={
+ ru:{f:'🇷🇺',n:'Россия',m:1,cost:200,dn:3,rmax:2},
+ ua:{f:'🇺🇦',n:'Украина',m:.8,cost:160,dn:4,rmax:1},
+ kz:{f:'🇰🇿',n:'Казахстан',m:1.2,cost:240,dn:3,rmax:1}};
+const LET={ru:'АВЕКМНОРСТУХ'.split(''),ua:'ABCEHIKMOPTX'.split(''),kz:'ABCDEFGHJKLMNPRSTUVXYZ'.split('')};
+const REG={
+ ru:{n:['16','116','52','152','23','93','123','61','161','63','163','74','174','66','96','54','154','24','124','55'],p1:['77','97','99','177','197','199','78','98','178','198','50','90','150','190','750','790'],p2:['777','797','799']},
+ ua:{n:['AB','AC','AE','AH','AI','AM','AO','AP','AT','AX','BA','BC','BE','BH','BI','BK','BM','BO','BT','BX','CA','CB','CE','CH'],p1:['AA','KA'],p2:[]},
+ kz:{n:['03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20'],p1:['01','02'],p2:[]}};
+const REC=[[[0,0,0]],[[1,0,0],[0,1,0],[0,0,1]],[[2,0,0],[1,1,0],[1,0,1],[0,1,1],[0,2,0],[0,0,2]],
+ [[3,0,0],[2,1,0],[2,0,1],[1,1,1],[1,2,0],[0,2,1]],[[4,0,0],[3,1,0],[3,0,1],[2,2,0],[2,1,1],[1,2,1],[3,1,1],[2,2,1]],
+ [[4,2,0],[4,1,1],[3,2,1],[4,2,1],[4,2,2]]];
+const fmtN=n=>n.toLocaleString('ru-RU')+' 🪙';
+
+function dscore(D){
+ const n=D.length;
+ if(/^(\d)\1+$/.test(D))return 4;
+ const st=[...D].slice(1).map((x,i)=>+x-+D[i]);
+ if(st.every(x=>x==1)||st.every(x=>x==-1))return 3;
+ if(n==3&&/^00/.test(D)||n==4&&/^000/.test(D))return 3;
+ if(/00$/.test(D)||n==4&&/^00/.test(D))return 2;
+ if(D==[...D].reverse().join('')||n==4&&/^(\d)(?!\1)(\d)\1\2$/.test(D))return 1;
+ return 0;
+}
+function lscore(it){
+ const L=it.L;
+ if(it.k=='ua')return L==it.reg?2:L[0]==L[1]?1:0;
+ const [a,b,c]=L;return a==b&&b==c?2:(a==b||a==c||b==c)?1:0;
+}
+const rscore=it=>REG[it.k].p2.includes(it.reg)?2:REG[it.k].p1.includes(it.reg)?1:0;
+function cls(it){const t=dscore(it.D)+lscore(it)+rscore(it);return t>=6?5:t>=4?4:t}
+
+function digFor(n,ds){
+ const r19=()=>rnd(1,10);
+ for(;;){
+  let D;
+  if(ds==4)D=String(r19()).repeat(n);
+  else if(ds==3){
+   if(Math.random()<.5){const u=Math.random()<.5,s=u?rnd(0,11-n):rnd(n-1,10);D=Array.from({length:n},(_,i)=>u?s+i:s-i).join('')}
+   else D='0'.repeat(n-1)+r19();
+  }
+  else if(ds==2)D=n==3?r19()+'00':r19()+''+d()+'00';
+  else if(ds==1){const a=d(),b=d();D=n==3?''+a+b+a:Math.random()<.5?''+a+b+b+a:''+a+b+a+b}
+  else D=rds(n);
+  if(dscore(D)==ds)return D;
+ }
+}
+function letFor(k,ls,reg){
+ const A=LET[k],a=pick(A),b=pick(A.filter(x=>x!=a));
+ if(k=='ua')return ls==2?reg:ls==1?a+a:a+b;
+ return ls==2?a+a+a:ls==1?[a,a,b].sort(()=>Math.random()-.5).join(''):a+b+pick(A.filter(x=>x!=a&&x!=b));
+}
+function gen(k,r){
+ const c=C[k],rec=pick(REC[r].filter(x=>x[2]<=c.rmax));
+ for(;;){
+  const reg=pick(REG[k][['n','p1','p2'][rec[2]]]);
+  const it={k,reg,D:digFor(c.dn,rec[0]),L:letFor(k,rec[1],reg)};
+  if(cls(it)==r)return it;
+ }
+}
+const rndPlate=k=>({k,reg:pick(REG[k].n),D:rds(C[k].dn),L:Array.from({length:k=='ua'?2:3},()=>pick(LET[k])).join('')});
+const dots=k=>({k,reg:'··',D:'·'.repeat(C[k].dn),L:'·'.repeat(k=='ua'?2:3)});
+
+function plate(it,fs){
+ const s=fs?` style="--fs:${fs}px"`:'';
+ if(it.k=='ru')return `<div class="pl"${s}><div class="pm">${it.L[0]}${it.D}${it.L.slice(1)}</div><div class="rg"><b>${it.reg}</b><span><u></u>RUS</span></div></div>`;
+ if(it.k=='ua')return `<div class="pl"${s}><div class="st ua">UA</div><div class="pm">${it.reg} ${it.D} ${it.L}</div></div>`;
+ return `<div class="pl"${s}><div class="st kz">KZ</div><div class="pm">${it.D} ${it.L}</div><div class="rg"><b>${it.reg}</b></div></div>`;
+}
+
+let S={bal:1000,inv:[],n:0},cur='ru',last=null,busy=false,flt='all',idle=true;
+try{const t=JSON.parse(localStorage.getItem('pk1'));if(t&&Array.isArray(t.inv))S=t}catch(e){}
+const save=()=>{try{localStorage.setItem('pk1',JSON.stringify(S))}catch(e){}};
+const bigFs=()=>Math.min(38,Math.max(24,(Math.min(innerWidth,480)-60)/(cur=='ua'?8.2:cur=='ru'?7.6:8.6)));
+
+function rbal(){$('bal').textContent=fmtN(S.bal);$('cnt').textContent=S.inv.length?'('+S.inv.length+')':'';
+ const c=C[cur];$('go').disabled=busy||S.bal<c.cost;
+ $('go').textContent=S.bal<c.cost?'Не хватает монет':`Выбить номер · ${fmtN(c.cost)}`;
+ $('bonus').hidden=!(S.bal<120&&!S.inv.length);}
+function rseg(){$('cs').innerHTML=Object.keys(C).map(k=>`<button data-k="${k}" class="${k==cur?'on':''}">${C[k].f} ${C[k].n}<small>${fmtN(C[k].cost)}</small></button>`).join('')}
+function rodds(){$('odds').innerHTML=R.map((r,i)=>`<div class="od" style="--rc:var(--c${i})"><i></i><b>${r.k}</b><span>${r.w/10}% · ${r.lo}–${r.hi}</span></div>`).join('')}
+function idleShow(){$('pw').innerHTML=plate(dots(cur),bigFs())}
+
+function show(it){
+ const st=$('stg'),pw=$('pw');
+ st.style.setProperty('--rc',`var(--c${it.r})`);pw.style.setProperty('--rc',`var(--c${it.r})`);
+ pw.className='pw pop'+(it.r>=3?' g':'')+(it.r==5?' m':'');
+ pw.innerHTML=plate(it,bigFs());
+ $('rl').textContent=R[it.r].k;$('pr').textContent='Цена: '+fmtN(it.p);
+ $('sell').hidden=false;$('sell').textContent='Продать за '+fmtN(it.p);
+}
+function roll(){
+ const c=C[cur];if(busy||S.bal<c.cost)return;
+ busy=true;idle=false;S.bal-=c.cost;S.n++;$('sell').hidden=true;$('rl').textContent='Выбиваем…';$('pr').textContent='';
+ $('pw').className='pw';$('stg').style.removeProperty('--rc');rbal();
+ let x=Math.random()*1000,r=0;for(;r<5&&x>=R[r].w;r++)x-=R[r].w;
+ const it=Object.assign(gen(cur,r),{id:Date.now()+'-'+rnd(0,99999),r,p:Math.round((R[r].lo+Math.random()*(R[r].hi-R[r].lo))*c.m)});
+ let t=0;const k=cur,iv=setInterval(()=>{
+  $('pw').innerHTML=plate(rndPlate(k),bigFs());
+  if(++t>=14){clearInterval(iv);S.inv.push(it);last=it;busy=false;save();show(it);rbal();rstore()}
+ },60);
+}
+function sell(ids){
+ let g=0;S.inv=S.inv.filter(i=>{if(ids.includes(i.id)){g+=i.p;return false}return true});
+ S.bal+=g;save();rbal();rstore();
+ if(last&&ids.includes(last.id)){$('sell').hidden=true;$('pr').textContent='Продано за '+fmtN(last.p)}
+}
+function rstore(){
+ const fl=['all',...Object.keys(C)];
+ $('fl').innerHTML=fl.map(k=>`<button data-f="${k}" class="${k==flt?'on':''}">${k=='all'?'Все':C[k].f}</button>`).join('');
+ $('tot').textContent=fmtN(S.inv.reduce((a,i)=>a+i.p,0));
+ const L=S.inv.filter(i=>flt=='all'||i.k==flt).sort((a,b)=>b.p-a.p);
+ $('list').innerHTML=L.length?L.map(i=>`<div class="it" style="--rc:var(--c${i.r})"><div class="im">${plate(i,19)}<small>${R[i.r].k}</small></div><div class="ip">${fmtN(i.p)}<button data-s="${i.id}">Продать</button></div></div>`).join('')
+  :'<div class="empty">В гараже пусто.<br>Выбей первый номер — он появится здесь.</div>';
+}
+function two(btn,label,fn){let a=false,t;btn.onclick=()=>{if(a){clearTimeout(t);a=false;btn.textContent=label;fn();return}a=true;btn.textContent='Нажми ещё раз';t=setTimeout(()=>{a=false;btn.textContent=label},2200)}}
+
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x==b));
+ $('roll').hidden=b.dataset.t!='roll';$('store').hidden=b.dataset.t!='store';if(b.dataset.t=='store')rstore()});
+$('cs').onclick=e=>{const b=e.target.closest('[data-k]');if(b&&!busy){cur=b.dataset.k;rseg();rbal();if(idle)idleShow()}};
+$('fl').onclick=e=>{const b=e.target.closest('[data-f]');if(b){flt=b.dataset.f;rstore()}};
+$('list').onclick=e=>{const b=e.target.closest('[data-s]');if(b)sell([b.dataset.s])};
+$('go').onclick=roll;
+$('sell').onclick=()=>{if(last)sell([last.id])};
+$('bb').onclick=()=>{S.bal+=300;save();rbal()};
+two($('s0'),'Продать обычные',()=>sell(S.inv.filter(i=>i.r==0).map(i=>i.id)));
+two($('sa'),'Продать всё',()=>sell(S.inv.map(i=>i.id)));
+two($('rs'),'Начать заново',()=>{S={bal:1000,inv:[],n:0};last=null;idle=true;save();$('sell').hidden=true;$('rl').textContent='Выбери страну и жми кнопку';$('pr').textContent='';$('pw').className='pw';$('stg').style.removeProperty('--rc');idleShow();rbal();rstore()});
+rseg();rodds();rbal();rstore();idleShow();
+</script>
+</body>
+</html>
